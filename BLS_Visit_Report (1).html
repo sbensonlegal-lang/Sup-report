@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>BLS Supervised Visit Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#003169;--coral:#FE502D;--steel:#AFB9CC;--std:#6881AC;--chr:#232937;--owh:#F1F3F5;--lgr:#E7E7E7;--wht:#FFFFFF;--grn:#0F6E56;--grn-l:#EAF3DE;--amb:#BA7517;--amb-l:#FAEEDA;--red:#A32D2D;--red-l:#FCEBEB;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Roboto',sans-serif;background:var(--owh);color:var(--chr);min-height:100vh;}
+.topbar{background:var(--navy);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:36px;height:36px;border-radius:50%;background:var(--steel);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-mark svg{width:20px;height:20px;}
+.logo-name{font-weight:500;font-size:12px;letter-spacing:.15em;color:#fff;text-transform:uppercase;}
+.logo-sub{font-weight:300;font-size:10px;letter-spacing:.1em;color:var(--steel);text-transform:uppercase;margin-top:2px;}
+.save-indicator{font-size:11px;color:var(--steel);display:flex;align-items:center;gap:6px;}
+.save-dot{width:8px;height:8px;border-radius:50%;background:var(--steel);transition:background .3s;}
+.save-dot.saved{background:#4CAF50;}.save-dot.saving{background:var(--amb);animation:pulse .8s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.app{max-width:900px;margin:0 auto;padding:20px 16px 80px;}
+.card{background:var(--wht);border:1px solid var(--lgr);border-radius:4px;padding:18px 20px;margin-bottom:14px;}
+.card-title{font-family:'Libre Baskerville',serif;font-size:14px;color:var(--navy);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--lgr);display:flex;align-items:center;justify-content:space-between;}
+.card-title-left{display:flex;align-items:center;gap:8px;}
+.card-title-left::before,.card-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;flex-shrink:0;}
+.card-title-text{font-family:'Libre Baskerville',serif;font-size:14px;color:var(--navy);}
+.fr{display:grid;gap:12px;margin-bottom:12px;}
+.c2{grid-template-columns:1fr 1fr;}.c3{grid-template-columns:1fr 1fr 1fr;}
+label{font-size:11px;color:#666;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:500;}
+input,select,textarea{width:100%;font-size:13px;padding:9px 11px;border:1px solid var(--lgr);border-radius:3px;background:var(--wht);color:var(--chr);font-family:'Roboto',sans-serif;transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy);}
+textarea{resize:vertical;min-height:80px;line-height:1.55;}
+.required{color:var(--coral);}
+
+/* PERSON CARDS */
+.person-card{background:var(--owh);border:1px solid var(--lgr);border-radius:4px;padding:14px;margin-bottom:10px;position:relative;}
+.person-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.person-label{font-size:12px;font-weight:500;color:var(--navy);text-transform:uppercase;letter-spacing:.08em;}
+.remove-btn{padding:3px 10px;font-size:11px;color:var(--red);border:1px solid var(--lgr);background:transparent;border-radius:3px;cursor:pointer;font-family:'Roboto',sans-serif;}
+.remove-btn:hover{background:var(--red-l);border-color:var(--red);}
+.add-person-btn{width:100%;padding:9px;border:1px dashed var(--lgr);background:transparent;color:var(--std);font-size:12px;border-radius:3px;cursor:pointer;font-family:'Roboto',sans-serif;transition:all .15s;margin-top:4px;}
+.add-person-btn:hover{border-color:var(--navy);color:var(--navy);background:var(--owh);}
+
+/* MOOD PILLS */
+.pill-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.pill{padding:5px 12px;font-size:12px;border-radius:3px;border:1px solid var(--lgr);cursor:pointer;color:var(--chr);background:var(--wht);user-select:none;transition:all .12s;}
+.pill:hover{border-color:var(--navy);}
+.pill.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* BLOCKS */
+.block-card{background:var(--wht);border:1px solid var(--lgr);border-radius:4px;padding:14px 16px;margin-bottom:10px;border-left:3px solid var(--steel);transition:border-left-color .2s;}
+.block-card.complete{border-left-color:var(--grn);}
+.block-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.block-label-input{border:none;background:transparent;font-family:'Libre Baskerville',serif;font-size:13px;color:var(--navy);font-weight:700;width:140px;padding:0;}
+.block-time-input{border:1px solid var(--lgr);border-radius:12px;font-size:12px;color:var(--std);background:var(--owh);padding:3px 10px;width:160px;}
+.add-block-btn{width:100%;padding:10px;border:1px dashed var(--lgr);background:transparent;color:var(--std);font-size:13px;border-radius:3px;cursor:pointer;font-family:'Roboto',sans-serif;transition:all .15s;margin-top:6px;}
+.add-block-btn:hover{border-color:var(--navy);color:var(--navy);}
+
+/* SAFETY */
+.safety-row{display:flex;align-items:center;gap:16px;margin-bottom:10px;flex-wrap:wrap;}
+.radio-group{display:flex;gap:14px;}
+.radio-group label{display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--chr);margin:0;cursor:pointer;}
+.radio-group input[type=radio]{width:auto;margin:0;accent-color:var(--navy);}
+.safety-concern{background:var(--red-l);border:1px solid #FCEBEB;border-left:3px solid var(--red);border-radius:3px;padding:10px 12px;margin-top:8px;}
+
+/* TIMER */
+.timer-bar{background:var(--owh);border:1px solid var(--lgr);border-radius:4px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.timer-val{font-family:'Libre Baskerville',serif;font-size:20px;color:var(--navy);letter-spacing:.05em;}
+.timer-label{font-size:12px;color:var(--std);}
+.timer-btn{padding:5px 14px;font-size:12px;border-radius:3px;border:1px solid var(--lgr);background:transparent;cursor:pointer;font-family:'Roboto',sans-serif;transition:all .12s;}
+.timer-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+.timer-btn.stop{color:var(--red);border-color:var(--red);}
+.timer-btn.stop:hover{background:var(--red);color:#fff;}
+
+/* SESSIONS */
+.session-card{background:var(--wht);border:1px solid var(--lgr);border-radius:4px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .15s;}
+.session-card:hover{border-color:var(--std);}
+.session-name{font-family:'Libre Baskerville',serif;font-size:14px;color:var(--navy);}
+.session-meta{font-size:12px;color:#888;margin-top:2px;}
+.session-badge{font-size:11px;padding:3px 8px;border-radius:3px;background:var(--amb-l);color:var(--amb);}
+.session-badge.done{background:var(--grn-l);color:var(--grn);}
+
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--wht);border-top:1px solid var(--lgr);padding:12px 20px;display:flex;gap:10px;justify-content:flex-end;z-index:100;padding-bottom:max(12px,env(safe-area-inset-bottom));}
+.btn{padding:9px 20px;font-size:12px;cursor:pointer;font-weight:500;transition:all .15s;letter-spacing:.06em;text-transform:uppercase;font-family:'Roboto',sans-serif;border-radius:3px;border:none;}
+.btn-primary{background:var(--navy);color:#fff;}.btn-primary:hover{background:var(--chr);}
+.btn-ghost{background:transparent;color:var(--navy);border:1px solid var(--navy)!important;}.btn-ghost:hover{background:var(--navy);color:#fff;}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--lgr)!important;font-size:11px;padding:5px 12px;}
+.screen{display:none;}.screen.active{display:block;}
+.divider{height:1px;background:var(--lgr);margin:14px 0;}
+@media print{.topbar,.bottom-bar,.add-block-btn,.btn,.add-person-btn,.remove-btn,#screen-sessions{display:none!important;}.app{padding:0;max-width:100%;}.card,.block-card{break-inside:avoid;box-shadow:none;border:1px solid #ccc;}}
+@media(max-width:600px){.c2,.c3{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-mark">
+      <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="19" fill="#AFB9CC" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/><path d="M14 10 Q14 20 20 20 Q14 20 14 30" stroke="#003169" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M14 10 Q26 10 26 16 Q26 20 20 20" stroke="#003169" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M20 20 Q28 20 28 25 Q28 30 14 30" stroke="#003169" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <div class="logo-name">Benson</div>
+      <div class="logo-sub">Visit Reports</div>
+    </div>
+  </div>
+  <div class="save-indicator">
+    <div class="save-dot" id="save-dot"></div>
+    <span id="save-label">All saved</span>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- SESSIONS -->
+  <div id="screen-sessions" class="screen active">
+    <div class="card">
+      <div class="card-title" style="justify-content:unset;">Saved Reports</div>
+      <div id="session-list"><div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">No reports yet. Start a new visit to begin.</div></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="newReport()">+ Start New Visit Report</button>
+  </div>
+
+  <!-- REPORT -->
+  <div id="screen-report" class="screen">
+
+    <!-- Case Info -->
+    <div class="card">
+      <div class="card-title" style="justify-content:unset;"><span class="card-title-left" style="gap:8px;"><span style="display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;flex-shrink:0;"></span>Case Information</span></div>
+      <div class="fr c3">
+        <div><label>Date of Visit <span class="required">*</span></label><input type="date" id="f-date"/></div>
+        <div><label>Docket / Case No.</label><input type="text" id="f-docket" placeholder="e.g. 2025-FC-00123"/></div>
+        <div><label>Visit Location</label><input type="text" id="f-location" placeholder="e.g. 17 E Philadelphia St."/></div>
+      </div>
+      <div class="fr c2">
+        <div><label>Supervisor Name <span class="required">*</span></label><input type="text" id="f-supervisor" placeholder="Full name"/></div>
+        <div><label>Scheduled Visit Length</label><input type="text" id="f-length" placeholder="e.g. 1 hour, 90 mins"/></div>
+      </div>
+    </div>
+
+    <!-- Visiting Parents -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--lgr);">
+        <div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;"></span><span style="font-family:'Libre Baskerville',serif;font-size:14px;color:var(--navy);">Visiting Parent(s)</span></div>
+        <button class="add-person-btn" style="width:auto;padding:5px 14px;margin:0;" onclick="addVisitingParent()">+ Add Parent</button>
+      </div>
+      <div id="visiting-parents-list"></div>
+    </div>
+
+    <!-- Custodial Parents -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--lgr);">
+        <div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;"></span><span style="font-family:'Libre Baskerville',serif;font-size:14px;color:var(--navy);">Custodial Parent(s) / Guardian(s)</span></div>
+        <button class="add-person-btn" style="width:auto;padding:5px 14px;margin:0;" onclick="addCustodialParent()">+ Add Parent</button>
+      </div>
+      <div id="custodial-parents-list"></div>
+    </div>
+
+    <!-- Children -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--lgr);">
+        <div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;"></span><span style="font-family:'Libre Baskerville',serif;font-size:14px;color:var(--navy);">Children Present</span></div>
+        <button class="add-person-btn" style="width:auto;padding:5px 14px;margin:0;" onclick="addChild()">+ Add Child</button>
+      </div>
+      <div id="children-list"></div>
+    </div>
+
+    <!-- Arrival -->
+    <div class="card">
+      <div class="card-title" style="justify-content:unset;"><span style="display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;margin-right:8px;"></span>Arrival & Setup</div>
+      <div class="fr c3">
+        <div><label>Visiting Parent Arrival</label><input type="time" id="f-arr-supervisee"/></div>
+        <div><label>Child(ren) Arrival</label><input type="time" id="f-arr-children"/></div>
+        <div><label>Visit Start Time</label><input type="time" id="f-start-time"/></div>
+      </div>
+      <div class="fr c2">
+        <div><label>Food / Drinks Brought</label><input type="text" id="f-food" placeholder="e.g. water, snacks, none"/></div>
+        <div><label>Items / Gifts Brought</label><input type="text" id="f-items" placeholder="e.g. birthday gift, toy, none"/></div>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-bar">
+      <div><div class="timer-label">Visit Timer</div><div class="timer-val" id="timer-display">00:00</div></div>
+      <div style="display:flex;gap:8px;">
+        <button class="timer-btn" id="timer-btn" onclick="toggleTimer()">Start</button>
+        <button class="timer-btn stop" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+
+    <!-- 15-min blocks -->
+    <div class="card">
+      <div class="card-title" style="justify-content:unset;"><span style="display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;margin-right:8px;"></span>Visit Narrative — 15-Minute Blocks</div>
+      <div id="blocks-container"></div>
+      <button class="add-block-btn" onclick="addBlock()">+ Add Time Block</button>
+    </div>
+
+    <!-- Departure -->
+    <div class="card">
+      <div class="card-title" style="justify-content:unset;"><span style="display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;margin-right:8px;"></span>Departure & Handoff</div>
+      <div class="fr c2">
+        <div><label>Visit End Time</label><input type="time" id="f-end-time"/></div>
+        <div><label>Custodial Parent Arrival for Pickup</label><input type="time" id="f-pickup-time"/></div>
+      </div>
+      <div><label>Handoff Notes</label><textarea id="f-handoff" placeholder="Describe how the child was transferred back. Note any exchanges between parties."></textarea></div>
+    </div>
+
+    <!-- Safety -->
+    <div class="card">
+      <div class="card-title" style="justify-content:unset;"><span style="display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;margin-right:8px;"></span>Safety Assessment</div>
+      <div class="safety-row">
+        <div style="font-size:13px;font-weight:500;">Physical Safety Concerns?</div>
+        <div class="radio-group"><label><input type="radio" name="phys-safety" value="No" checked onchange="safetyChange('phys')"/> No</label><label><input type="radio" name="phys-safety" value="Yes" onchange="safetyChange('phys')"/> Yes</label></div>
+      </div>
+      <div id="phys-concern" style="display:none;" class="safety-concern"><label>Describe Physical Safety Concern</label><textarea id="f-phys-concern" placeholder="Describe what occurred, when, and any action taken..."></textarea></div>
+      <div class="divider"></div>
+      <div class="safety-row">
+        <div style="font-size:13px;font-weight:500;">Mental / Emotional Health Concerns?</div>
+        <div class="radio-group"><label><input type="radio" name="mh-safety" value="No" checked onchange="safetyChange('mh')"/> No</label><label><input type="radio" name="mh-safety" value="Yes" onchange="safetyChange('mh')"/> Yes</label></div>
+      </div>
+      <div id="mh-concern" style="display:none;" class="safety-concern"><label>Describe Mental / Emotional Health Concern</label><textarea id="f-mh-concern" placeholder="Describe observations and any action taken..."></textarea></div>
+      <div class="divider"></div>
+      <div class="safety-row">
+        <div style="font-size:13px;font-weight:500;">Rule Violations?</div>
+        <div class="radio-group"><label><input type="radio" name="violations" value="No" checked onchange="safetyChange('viol')"/> No</label><label><input type="radio" name="violations" value="Yes" onchange="safetyChange('viol')"/> Yes</label></div>
+      </div>
+      <div id="viol-concern" style="display:none;" class="safety-concern"><label>Describe Violations and Supervisor Response</label><textarea id="f-viol-concern" placeholder="Describe what rule was violated and what action was taken..."></textarea></div>
+      <div class="divider"></div>
+      <div class="safety-row">
+        <div style="font-size:13px;font-weight:500;">Mandatory Report Filed?</div>
+        <div class="radio-group"><label><input type="radio" name="mand-report" value="No" checked onchange="safetyChange('mand')"/> No</label><label><input type="radio" name="mand-report" value="Yes" onchange="safetyChange('mand')"/> Yes</label></div>
+      </div>
+      <div id="mand-concern" style="display:none;" class="safety-concern"><label>Mandatory Report Details</label><textarea id="f-mand-concern" placeholder="Agency contacted, date/time, nature of concern..."></textarea></div>
+    </div>
+
+    <!-- Comments -->
+    <div class="card">
+      <div class="card-title" style="justify-content:unset;"><span style="display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;margin-right:8px;"></span>Additional Comments & Observations</div>
+      <textarea id="f-comments" placeholder="Any additional observations or information relevant to this visit..." style="min-height:100px;"></textarea>
+    </div>
+
+    <!-- Signature -->
+    <div class="card">
+      <div class="card-title" style="justify-content:unset;"><span style="display:inline-block;width:3px;height:14px;background:var(--coral);border-radius:1px;margin-right:8px;"></span>Supervisor Certification</div>
+      <p style="font-size:13px;color:#555;margin-bottom:14px;line-height:1.6;">I certify that the above is a true and accurate account of the supervised visit described herein and that I was present for the duration of the visit as noted above.</p>
+      <div class="fr c2">
+        <div><label>Supervisor Signature (Type Full Name)</label><input type="text" id="f-sig" placeholder="Type full legal name"/></div>
+        <div><label>Date Signed</label><input type="date" id="f-sig-date"/></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-bottom:80px;">
+      <button class="btn btn-ghost" onclick="printReport()">Print / Save PDF</button>
+      <button class="btn btn-danger" onclick="deleteReport()">Delete This Report</button>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-bar" id="bottom-bar-report" style="display:none;">
+  <button class="btn btn-ghost" onclick="showSessions()">← All Reports</button>
+  <button class="btn btn-primary" onclick="manualSave()">Save Report</button>
+</div>
+
+<script>
+var currentId=null,blockCount=0,timerInterval=null,timerSeconds=0,timerRunning=false,autoSaveTimer=null;
+var vpCount=0,cpCount=0,childCount=0;
+const MOODS=['Calm','Happy','Excited','Playful','Quiet','Tired','Anxious','Upset','Reluctant','Clingy','Withdrawn','Tearful'];
+
+function getKey(id){return 'bls_visit_'+id;}
+
+function listReports(){
+  var r=[];
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.startsWith('bls_visit_')){var d=JSON.parse(localStorage.getItem(k));if(d)r.push(d);}}
+  r.sort(function(a,b){return(b.updated||0)-(a.updated||0)});}catch(e){}return r;
+}
+
+function saveReport(){
+  if(!currentId)return;setSaveState('saving');
+  try{var d=collectData();d.id=currentId;d.updated=Date.now();localStorage.setItem(getKey(currentId),JSON.stringify(d));setTimeout(function(){setSaveState('saved');},400);}
+  catch(e){setSaveState('error');}
+}
+
+function setSaveState(s){
+  var dot=document.getElementById('save-dot'),lbl=document.getElementById('save-label');
+  dot.className='save-dot '+(s==='saved'?'saved':s==='saving'?'saving':'');
+  lbl.textContent=s==='saved'?'All saved':s==='saving'?'Saving...':'Save failed';
+}
+
+function scheduleAutoSave(){clearTimeout(autoSaveTimer);autoSaveTimer=setTimeout(saveReport,1200);setSaveState('saving');}
+function manualSave(){saveReport();}
+
+function gv(id){var e=document.getElementById(id);return e?e.value:'';}
+function sv(id,val){var e=document.getElementById(id);if(e&&val!=null)e.value=val;}
+
+// ---- PERSONS ----
+function addVisitingParent(data){
+  vpCount++;
+  var idx=vpCount;
+  var div=document.createElement('div');
+  div.className='person-card';
+  div.dataset.vp=idx;
+  div.innerHTML='<div class="person-card-header"><span class="person-label">Visiting Parent '+idx+'</span>'+(idx>1?'<button class="remove-btn" onclick="removePerson(this,\'vp\')">Remove</button>':'')+'</div>'+
+    '<div class="fr c3"><div><label>Full Name</label><input type="text" placeholder="Full name" data-field="name" oninput="scheduleAutoSave()"/></div>'+
+    '<div><label>Relationship to Child</label><input type="text" placeholder="e.g. Father, Mother" data-field="rel" oninput="scheduleAutoSave()"/></div>'+
+    '<div><label>Arrival Time</label><input type="time" data-field="arrival" oninput="scheduleAutoSave()"/></div></div>';
+  document.getElementById('visiting-parents-list').appendChild(div);
+  if(data){div.querySelector('[data-field=name]').value=data.name||'';div.querySelector('[data-field=rel]').value=data.rel||'';div.querySelector('[data-field=arrival]').value=data.arrival||'';}
+}
+
+function addCustodialParent(data){
+  cpCount++;
+  var idx=cpCount;
+  var div=document.createElement('div');
+  div.className='person-card';
+  div.dataset.cp=idx;
+  div.innerHTML='<div class="person-card-header"><span class="person-label">Custodial Parent / Guardian '+idx+'</span>'+(idx>1?'<button class="remove-btn" onclick="removePerson(this,\'cp\')">Remove</button>':'')+'</div>'+
+    '<div class="fr c3"><div><label>Full Name</label><input type="text" placeholder="Full name" data-field="name" oninput="scheduleAutoSave()"/></div>'+
+    '<div><label>Relationship to Child</label><input type="text" placeholder="e.g. Mother, Grandmother" data-field="rel" oninput="scheduleAutoSave()"/></div>'+
+    '<div><label>Phone</label><input type="tel" placeholder="(555) 000-0000" data-field="phone" oninput="scheduleAutoSave()"/></div></div>';
+  document.getElementById('custodial-parents-list').appendChild(div);
+  if(data){div.querySelector('[data-field=name]').value=data.name||'';div.querySelector('[data-field=rel]').value=data.rel||'';div.querySelector('[data-field=phone]').value=data.phone||'';}
+}
+
+function addChild(data){
+  childCount++;
+  var idx=childCount;
+  var div=document.createElement('div');
+  div.className='person-card';
+  div.dataset.child=idx;
+  var moodId='child-mood-'+idx;
+  div.innerHTML='<div class="person-card-header"><span class="person-label">Child '+idx+'</span>'+(idx>1?'<button class="remove-btn" onclick="removePerson(this,\'child\')">Remove</button>':'')+'</div>'+
+    '<div class="fr c3"><div><label>Full Name</label><input type="text" placeholder="Full name" data-field="name" oninput="scheduleAutoSave()"/></div>'+
+    '<div><label>Age</label><input type="text" placeholder="e.g. 5" data-field="age" oninput="scheduleAutoSave()"/></div>'+
+    '<div><label>Date of Birth</label><input type="date" data-field="dob" oninput="scheduleAutoSave()"/></div></div>'+
+    '<div><label>Mood / Presentation at Arrival</label>'+
+    '<div class="pill-row" id="'+moodId+'">'+
+    MOODS.map(function(m){return '<div class="pill" onclick="togPill(this)">'+m+'</div>';}).join('')+
+    '</div></div>';
+  document.getElementById('children-list').appendChild(div);
+  if(data){
+    div.querySelector('[data-field=name]').value=data.name||'';
+    div.querySelector('[data-field=age]').value=data.age||'';
+    div.querySelector('[data-field=dob]').value=data.dob||'';
+    if(data.mood){
+      div.querySelectorAll('.pill').forEach(function(p){
+        if(data.mood.includes(p.textContent.trim()))p.classList.add('on');
+      });
+    }
+  }
+}
+
+function removePerson(btn,type){
+  var card=btn.closest('.person-card');
+  card.parentNode.removeChild(card);
+  scheduleAutoSave();
+}
+
+function togPill(el){el.classList.toggle('on');scheduleAutoSave();}
+
+// ---- BLOCKS ----
+function blockLabel(n){var a=['0–15 mins','15–30 mins','30–45 mins','45–60 mins','60–75 mins','75–90 mins','90–105 mins','105–120 mins'];return a[n]||(n*15)+'–'+(n*15+15)+' mins';}
+
+function addBlock(label,time,text){
+  var idx=blockCount++;
+  var lbl=label!==undefined?label:blockLabel(idx);
+  var div=document.createElement('div');
+  div.className='block-card block-entry';
+  div.innerHTML='<div class="block-header">'+
+    '<input class="block-label-input" value="'+escHtml(lbl)+'" oninput="scheduleAutoSave()"/>'+
+    '<input class="block-time-input" type="text" value="'+(time||'')+'" placeholder="e.g. 6:00–6:15 PM" oninput="scheduleAutoSave()"/>'+
+  '</div>'+
+  '<textarea placeholder="Describe what occurred during this 15-minute period..." oninput="blockActivity(this);scheduleAutoSave()">'+(text||'')+'</textarea>';
+  document.getElementById('blocks-container').appendChild(div);
+  if(!text)setTimeout(function(){div.querySelector('textarea').focus();},50);
+}
+
+function blockActivity(ta){
+  var c=ta.closest('.block-card');
+  if(ta.value.trim())c.classList.add('complete');else c.classList.remove('complete');
+}
+
+// ---- TIMER ----
+function toggleTimer(){
+  if(!timerRunning){
+    timerRunning=true;document.getElementById('timer-btn').textContent='Pause';
+    timerInterval=setInterval(function(){timerSeconds++;updateTimerDisplay();if(timerSeconds%30===0)scheduleAutoSave();},1000);
+  }else{timerRunning=false;document.getElementById('timer-btn').textContent='Resume';clearInterval(timerInterval);}
+}
+
+function resetTimer(){if(!confirm('Reset timer to 0?'))return;clearInterval(timerInterval);timerRunning=false;timerSeconds=0;document.getElementById('timer-btn').textContent='Start';updateTimerDisplay();}
+function updateTimerDisplay(){var h=Math.floor(timerSeconds/3600),m=Math.floor((timerSeconds%3600)/60),s=timerSeconds%60;document.getElementById('timer-display').textContent=(h>0?pad(h)+':':'')+pad(m)+':'+pad(s);}
+function pad(n){return n<10?'0'+n:''+n;}
+
+// ---- SAFETY ----
+function safetyChange(type){
+  var map={phys:['phys-safety','phys-concern'],mh:['mh-safety','mh-concern'],mand:['mand-report','mand-concern'],viol:['violations','viol-concern']};
+  var pair=map[type];
+  var el=document.querySelector('input[name="'+pair[0]+'"]:checked');
+  var div=document.getElementById(pair[1]);
+  if(div)div.style.display=(el&&el.value==='Yes')?'block':'none';
+}
+
+// ---- COLLECT & RESTORE ----
+function collectData(){
+  // Visiting parents
+  var vps=[];
+  document.querySelectorAll('#visiting-parents-list .person-card').forEach(function(c){
+    vps.push({name:c.querySelector('[data-field=name]').value,rel:c.querySelector('[data-field=rel]').value,arrival:c.querySelector('[data-field=arrival]').value});
+  });
+  // Custodial parents
+  var cps=[];
+  document.querySelectorAll('#custodial-parents-list .person-card').forEach(function(c){
+    cps.push({name:c.querySelector('[data-field=name]').value,rel:c.querySelector('[data-field=rel]').value,phone:c.querySelector('[data-field=phone]').value});
+  });
+  // Children
+  var kids=[];
+  document.querySelectorAll('#children-list .person-card').forEach(function(c){
+    var moods=[];
+    c.querySelectorAll('.pill.on').forEach(function(p){moods.push(p.textContent.trim());});
+    kids.push({name:c.querySelector('[data-field=name]').value,age:c.querySelector('[data-field=age]').value,dob:c.querySelector('[data-field=dob]').value,mood:moods});
+  });
+  // Blocks
+  var blocks=[];
+  document.querySelectorAll('.block-entry').forEach(function(b){
+    blocks.push({label:b.querySelector('.block-label-input').value,time:b.querySelector('.block-time-input').value,text:b.querySelector('textarea').value});
+  });
+
+  return {
+    date:gv('f-date'),docket:gv('f-docket'),location:gv('f-location'),
+    supervisor:gv('f-supervisor'),length:gv('f-length'),
+    visiting_parents:vps,custodial_parents:cps,children:kids,
+    arr_children:gv('f-arr-children'),start_time:gv('f-start-time'),
+    end_time:gv('f-end-time'),pickup_time:gv('f-pickup-time'),
+    food:gv('f-food'),items:gv('f-items'),handoff:gv('f-handoff'),
+    phys_safety:rdv('phys-safety'),phys_concern:gv('f-phys-concern'),
+    mh_safety:rdv('mh-safety'),mh_concern:gv('f-mh-concern'),
+    violations:rdv('violations'),viol_concern:gv('f-viol-concern'),
+    mand_report:rdv('mand-report'),mand_concern:gv('f-mand-concern'),
+    comments:gv('f-comments'),sig:gv('f-sig'),sig_date:gv('f-sig-date'),
+    blocks:blocks,timer_seconds:timerSeconds
+  };
+}
+
+function rdv(name){var e=document.querySelector('input[name="'+name+'"]:checked');return e?e.value:'No';}
+
+function restoreData(data){
+  sv('f-date',data.date);sv('f-docket',data.docket);sv('f-location',data.location);
+  sv('f-supervisor',data.supervisor);sv('f-length',data.length);
+  sv('f-arr-children',data.arr_children);sv('f-start-time',data.start_time);
+  sv('f-end-time',data.end_time);sv('f-pickup-time',data.pickup_time);
+  sv('f-food',data.food);sv('f-items',data.items);sv('f-handoff',data.handoff);
+  sv('f-phys-concern',data.phys_concern);sv('f-mh-concern',data.mh_concern);
+  sv('f-viol-concern',data.viol_concern);sv('f-mand-concern',data.mand_concern);
+  sv('f-comments',data.comments);sv('f-sig',data.sig);sv('f-sig-date',data.sig_date);
+
+  // Radio buttons
+  [['phys-safety',data.phys_safety],['mh-safety',data.mh_safety],['violations',data.violations],['mand-report',data.mand_report]].forEach(function(pair){
+    var el=document.querySelector('input[name="'+pair[0]+'"][value="'+(pair[1]||'No')+'"]');
+    if(el){el.checked=true;safetyChange(pair[0]==='phys-safety'?'phys':pair[0]==='mh-safety'?'mh':pair[0]==='violations'?'viol':'mand');}
+  });
+
+  // Persons
+  document.getElementById('visiting-parents-list').innerHTML='';
+  document.getElementById('custodial-parents-list').innerHTML='';
+  document.getElementById('children-list').innerHTML='';
+  vpCount=0;cpCount=0;childCount=0;
+
+  if(data.visiting_parents&&data.visiting_parents.length){data.visiting_parents.forEach(function(p){addVisitingParent(p);});}
+  else addVisitingParent();
+
+  if(data.custodial_parents&&data.custodial_parents.length){data.custodial_parents.forEach(function(p){addCustodialParent(p);});}
+  else addCustodialParent();
+
+  if(data.children&&data.children.length){data.children.forEach(function(c){addChild(c);});}
+  else addChild();
+
+  // Blocks
+  document.getElementById('blocks-container').innerHTML='';blockCount=0;
+  if(data.blocks&&data.blocks.length){data.blocks.forEach(function(b){addBlock(b.label,b.time,b.text);});}
+  else addBlock();
+
+  // Timer
+  if(data.timer_seconds){timerSeconds=data.timer_seconds;updateTimerDisplay();}
+}
+
+// ---- SESSIONS ----
+function showSessions(){if(currentId)saveReport();stopTimer();document.getElementById('screen-sessions').classList.add('active');document.getElementById('screen-report').classList.remove('active');document.getElementById('bottom-bar-report').style.display='none';renderSessionList();}
+function stopTimer(){if(timerRunning){clearInterval(timerInterval);timerRunning=false;}}
+
+function newReport(){
+  currentId='r'+Date.now();blockCount=0;timerSeconds=0;timerRunning=false;
+  document.getElementById('timer-btn').textContent='Start';updateTimerDisplay();
+  document.getElementById('visiting-parents-list').innerHTML='';
+  document.getElementById('custodial-parents-list').innerHTML='';
+  document.getElementById('children-list').innerHTML='';
+  document.getElementById('blocks-container').innerHTML='';
+  document.querySelectorAll('#screen-report input[type=text],#screen-report input[type=time],#screen-report input[type=date],#screen-report input[type=tel],#screen-report textarea').forEach(function(e){e.value='';});
+  document.querySelectorAll('#screen-report input[type=radio]').forEach(function(e){e.checked=e.value==='No';});
+  document.querySelectorAll('.safety-concern').forEach(function(d){d.style.display='none';});
+  vpCount=0;cpCount=0;childCount=0;
+  addVisitingParent();addCustodialParent();addChild();addBlock();
+  var today=new Date().toISOString().split('T')[0];
+  sv('f-date',today);sv('f-sig-date',today);
+  openReport();
+}
+
+function openReport(){
+  document.getElementById('screen-sessions').classList.remove('active');
+  document.getElementById('screen-report').classList.add('active');
+  document.getElementById('bottom-bar-report').style.display='flex';
+}
+
+function loadReport(id){
+  try{var data=JSON.parse(localStorage.getItem(getKey(id)));if(!data)return;currentId=id;blockCount=0;timerSeconds=0;restoreData(data);updateTimerDisplay();openReport();}
+  catch(e){alert('Could not load report.');}
+}
+
+function deleteReport(){if(!confirm('Permanently delete this report?'))return;try{localStorage.removeItem(getKey(currentId));}catch(e){}showSessions();}
+
+function renderSessionList(){
+  var reports=listReports();
+  var el=document.getElementById('session-list');
+  if(!reports.length){el.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">No reports yet. Start a new visit to begin.</div>';return;}
+  el.innerHTML=reports.map(function(r){
+    var vps=(r.visiting_parents||[]).map(function(p){return p.name;}).filter(Boolean).join(', ')||'Unknown';
+    var date=r.date?new Date(r.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'No date';
+    var done=r.sig&&r.sig.trim().length>0;
+    var updated=r.updated?new Date(r.updated).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
+    var kids=(r.children||[]).map(function(c){return c.name;}).filter(Boolean).join(', ');
+    return '<div class="session-card" onclick="loadReport(\''+r.id+'\')">'+
+      '<div><div class="session-name">'+escHtml(vps)+'</div>'+
+      '<div class="session-meta">'+date+(r.docket?' &bull; '+escHtml(r.docket):'')+(kids?' &bull; '+escHtml(kids):'')+'</div>'+
+      (updated?'<div class="session-meta" style="color:#bbb;">Saved: '+updated+'</div>':'')+
+      '</div><span class="session-badge '+(done?'done':'')+'">'+( done?'Signed':'In Progress')+'</span></div>';
+  }).join('');
+}
+
+function printReport(){saveReport();window.print();}
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// Init
+renderSessionList();setSaveState('saved');
+setInterval(function(){if(currentId)saveReport();},60000);
+</script>
+</body>
+</html>
